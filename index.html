@@ -46,44 +46,49 @@
     const map = L.map("map", mapOptions);
 
     // add a base map to the map
-/*    
+
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     	maxZoom: 19,
     	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-*/
+
+/*
     const imagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     }).addTo(map);
-
+*/
     // use jquery to load mennonite GeoJSON data
     $.when(
         $.getJSON("data/latin-america-mennonite-colonies.geojson"),
+
     // when the files are done loading,
     // identify them with names and process them through a function  
     ).done(function(lamennonite) {
         // instantiate the latin america mennonite colony layer
         const MennoniteColonies = L.geoJson(lamennonite, {
-        // style the layer
-        style: function(feature) {
-          return {
-            fillColor: "#F09030", // set the polygon fill to orange
-            fillOpacity: 0.3, // give the polygon fill a 30% opacity
-            color: "#F09030", // set the outline color to orange
-            weight: 1.2, // give the outline a weight
-            opacity: 0.7 // give the outline 70% opacity
-          };
-        },
-        onEachFeature: function(feature, layer) {
-            // define the tooltip info
-            let colonyTooltip = layer.feature.properties.Name + ' Colony, ' + layer.feature.properties.Country;
-            // bind the tooltip to the layer and add the content defined as "cityTooltip" above
-            layer.bindTooltip(colonyTooltip, {
-                sticky: true,
-                className: "tooltip",
-            });
-        }
-      }).addTo(map);
+            // style the layer
+            style: function(feature) {
+            return {
+                fillColor: "#F09030", // set the polygon fill to orange
+                fillOpacity: 0.3, // give the polygon fill a 30% opacity
+                color: "#F09030", // set the outline color to orange
+                weight: 1.2, // give the outline a weight
+                opacity: 0.7 // give the outline 70% opacity
+            };
+            },
+            onEachFeature: function(feature, layer) {
+                // define the tooltip info
+                let colonyTooltip = layer.feature.properties.Name + ' Colony, ' + layer.feature.properties.Country;
+                // bind the tooltip to the layer and add the content defined as "cityTooltip" above
+                layer.bindTooltip(colonyTooltip, {
+                    sticky: true,
+                    className: "tooltip",
+                });
+                layer.on("click", function(){
+                    console.log('layer clicked');
+                });
+            }
+        }).addTo(map);
     });
 
   </script>
