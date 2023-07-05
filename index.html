@@ -12,10 +12,11 @@
     <h5 class='txt-bold'><span></span></h5>
   </div>
 </div>
+
 <head>
   <meta charset="utf-8" />
   <!-- Give the page a title -->
-  <title>Mennonites Colonies in Latin America</title>
+  <title>Mennonite Colonies in Latin America</title>
   <!-- Add a link to the Leaflet CSS library so you can reference it for styling your map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
   <!-- All the CSS code goes inside the style tags below -->
@@ -26,6 +27,7 @@
       height: 100%;
       width: 100%;
     }
+
     /* style the map */
     #map {
       position: absolute;
@@ -33,15 +35,17 @@
       top: 1%;
       bottom: 0;
     }
+
     /* style the slider-control div */
     #slider-control {
       position: fixed;
-      bottom : 10%;
-      left : 10px;
-      width : 30%;
-      height : 25px;
-      z-index : 700;
+      bottom: 10%;
+      left: 10px;
+      width: 30%;
+      height: 25px;
+      z-index: 700;
     }
+
     /* Set time slider styles */
     #slider {
       position: absolute;
@@ -53,26 +57,27 @@
       border-radius: 3px;
       box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
     }
-    /* Set temporal legend styles */
-#temporal {
-  position: absolute;
-  height: 100%;
-  bottom: 0px;
-  width: 86px;
-  z-index: 1000;
-  background-color: #FFFFFF;
-  border-radius: 3px;
-  box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
-}
 
-/* Set the styles for the text span in the temporal legend */
-#temporal span {
-  font-family: 'Montserrat', sans-serif;
-  position: absolute;
-  font-size: 13px;
-  bottom: 4px;
-  left: 10px;
-}
+    /* Set temporal legend styles */
+    #temporal {
+      position: absolute;
+      height: 100%;
+      bottom: 0px;
+      width: 86px;
+      z-index: 1000;
+      background-color: #FFFFFF;
+      border-radius: 3px;
+      box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Set the styles for the text span in the temporal legend */
+    #temporal span {
+      font-family: 'Montserrat', sans-serif;
+      position: absolute;
+      font-size: 13px;
+      bottom: 4px;
+      left: 10px;
+    }
   </style>
 </head>
 
@@ -94,88 +99,126 @@
     // define the map with the options above
     const map = L.map("map", mapOptions);
 
-    // add a base map to the map
+    // define and add a base map to the map using Carto's Voyager tiles
+    const CartoDB_Voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    	subdomains: 'abcd',
+    	maxZoom: 20
+    }).addTo(map); // add this to the map so that it is on by default
 
-    const osm = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    	maxZoom: 19,
-    	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-/*
+    // define another base map option using Esri's World Imagery tiles
     const imagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    }).addTo(map);
-*/
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+
     // use jquery to load mennonite GeoJSON data
     $.when(
-        $.getJSON("data/latin-america-mennonite-colonies.geojson"),
+      $.getJSON("data/latin-america-mennonite-colonies.geojson"),
 
-    // when the files are done loading,
-    // identify them with names and process them through a function  
+      // when the files are done loading,
+      // identify them with names and process them through a function
     ).done(function(lamennonite) {
-        // instantiate the latin america mennonite colony layer
-        const MennoniteColonies = L.geoJson(lamennonite, {
-            // style the layer
-            style: function(feature) {
-            return {
-                fillColor: "red", // set the polygon fill to red
-                fillOpacity: 0.5, // give the polygon fill a 30% opacity
-                color: "#red", // set the outline color to red
-                weight: 3, // give the outline a weight
-                opacity: 0.9 // give the outline 70% opacity
-            };
-            },
-            onEachFeature: function(feature, layer) {
-                // define the tooltip info
-                let colonyTooltip = layer.feature.properties.Name + ' Colony, ' + layer.feature.properties.Country;
-                // bind the tooltip to the layer and add the content defined as "cityTooltip" above
-                layer.bindTooltip(colonyTooltip, {
-                    sticky: true,
-                    className: "tooltip",
-                });
-                layer.on("click", function(){
-                    console.log('layer clicked');
-                });
-                
-            }
-        }).addTo(map);
 
-        // define the value in the slider when the map loads
-let currentYear = $('.slider').val();
+      // instantiate the latin america mennonite colony layer
+      const MennoniteColonies = L.geoJson(lamennonite, {
+        // style the layer
+        style: function(feature) {
+          return {
+            fillColor: "red", // set the polygon fill to red
+            fillOpacity: 0.5, // give the polygon fill a 30% opacity
+            color: "red", // set the outline color to red
+            weight: 0.5, // give the outline a weight
+            opacity: 0.7 // give the outline 70% opacity
+          };
+        },
+        onEachFeature: function(feature, layer) {
+          // define the tooltip info
+          let colonyTooltip = layer.feature.properties.Name + ' Colony, ' + layer.feature.properties.Country;
+          // bind the tooltip to the layer and add the content defined as "cityTooltip" above
+          layer.bindTooltip(colonyTooltip, {
+            sticky: true,
+            className: "tooltip",
+          });
+          // define what happens upon clicking the layer
+          layer.on("click", function() {
+            console.log('layer clicked');
+          });
+          // define style changes on mouseover
+          layer.on("mouseover", function() {
+            // run the setStyle method on the layer
+            layer.setStyle({
+              fillColor: "yellow" // make the fill yellow
+            });
+          });
+          // define style changes on mouseout
+          layer.on("mouseout", function() {
+            // run the setStyle method again
+            layer.setStyle({
+              fillColor: "red" // reset the fill to red
+            });
+          });
+        }
+      }).addTo(map);
 
-        // call functions defined below
-  sequenceUI(MennoniteColonies, currentYear); // calls the time slider and sends the layer to it
+      // fit the map to the bounds of the MennoniteColonies layer
+      map.fitBounds(MennoniteColonies.getBounds());
+
+      // add these maps to a object named baseMaps
+      const baseMaps = {
+        "Carto Voyager": CartoDB_Voyager,
+        "Esri Imagery": imagery
+      };
+
+      // define a layer control
+      const layerControl = L.control.layers(baseMaps, null, { // null is a placeholder for overlays
+        collapsed: false // keeps the layer control open by default
+      }).addTo(map);
+
+      // define the value in the slider when the map loads
+      let currentYear = $('.slider').val();
+
+      // call functions defined below
+      sequenceUI(MennoniteColonies, currentYear); // calls the time slider and sends the layer to it
+      createTemporalLegend(currentYear); // calling this function here ensures that the temporal legend displays the appropriate year on load
+      updateColonies(MennoniteColonies, currentYear);
     });
-// call the UI slider with a function called "sequenceUI"
-function sequenceUI(MennoniteColonies, currentYear) { // feed it the colony data
+    // call the UI slider with a function called "sequenceUI"
+    function sequenceUI(MennoniteColonies, currentYear) { // feed it the colony data
 
-// use the jQuery ajax method to get the slider element
-$('.slider')
-  .on('input change', function() { // when the input changes...
-    let currentYear = $(this).val(); // identify the year selected with "currentYear"
-    createTemporalLegend(currentYear); // call the createTemporalLegend function
-    updateColones(MennoniteColonies, currentYear); // updates the layer according to the slider year upon loading
-    });
+      // use the jQuery ajax method to get the slider element
+      $('.slider')
+        .on('input change', function() { // when the input changes...
+          let currentYear = $(this).val(); // identify the year selected with "currentYear"
+          createTemporalLegend(currentYear); // call the createTemporalLegend function
+          updateColonies(MennoniteColonies, currentYear); // updates the layer according to the slider year upon loading
+        });
+
+    }; // End sequenceUI function
+
     // Define updateColonies function and feed it the colony data and the user-selected year
-function updateColonies(MennoniteColonies, currentYear) {
-  // access each layer in the colony data
-  MennoniteColonies.eachLayer(function(layer) {
-    // log the properties for each feature to the web console
-    console.log(layer.feature.properties);
-    // log the user-selected year
-    console.log(currentYear);
-  });
-}; // End updateColonies function
+    function updateColonies(MennoniteColonies, currentYear) {
+      // access each layer in the colony data
+      MennoniteColonies.eachLayer(function(layer) {
+        // define the colony establishment years
+        let estYear = layer.feature.properties.Est_date;
+        // use conditional logic to test if the layer properties match the time slider year
+        if (estYear <= currentYear) {
+          // if there is a match, add the MennoniteColonies layer to the map
+          layer.addTo(map);
+        } else {
+          // otherwise, remove the layer from the map
+          map.removeLayer(layer);
+        };
 
-}; // End sequenceUI function
+      });
+    }; // End updateColonies function
 
-// Add a temporal legend in sync with the UI slider
-function createTemporalLegend(currentYear) { // feed it the selected year
+    // Add a temporal legend in sync with the UI slider
+    function createTemporalLegend(currentYear) { // feed it the selected year
 
-$('#temporal span').html("Year: " + currentYear); // change grade value to that currently selected by UI slider
+      $('#temporal span').html("Year: " + currentYear); // change grade value to that currently selected by UI slider
 
-}; // End createTemporalLegend function
-
+    }; // End createTemporalLegend function
   </script>
 </body>
 
